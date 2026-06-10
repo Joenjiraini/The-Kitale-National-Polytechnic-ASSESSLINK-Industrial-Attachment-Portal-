@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronRight, ChevronLeft, Award, Sparkles, X, Users, Compass } from 'lucide-react';
 
+// Import local images from the Images folder
+import studentImg1 from '../../Images/images (1).jpeg';
+import studentImg2 from '../../Images/images (2).jpeg';
+import studentImg3 from '../../Images/images (3).jpeg';
+import studentImg4 from '../../Images/images (4).jpeg';
+import studentImg5 from '../../Images/images (5).jpeg';
+import studentImg6 from '../../Images/images.jpeg';
+import studentImg7 from '../../Images/1776760797230.jpeg';
+import studentImg8 from '../../Images/mMzje.jpg';
+
 interface StudentSuccess {
   id: number;
   name: string;
@@ -19,7 +29,7 @@ const STUDENTS: StudentSuccess[] = [
     course: "Electrical & Electronic Engineering",
     institution: "Kisumu National Polytechnic",
     company: "KenGen Kenya Ltd",
-    image: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=400&fit=crop&q=80",
+    image: studentImg1,
     story: "Spearheading green energy initiatives during his placement in geothermal power dispatch cells."
   },
   {
@@ -28,7 +38,7 @@ const STUDENTS: StudentSuccess[] = [
     course: "Information Technology & Cybersecurity",
     institution: "Kenya Coast National Polytechnic",
     company: "Safaricom Security Operations",
-    image: "https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=400&fit=crop&q=80",
+    image: studentImg2,
     story: "Collaborated on implementing state-of-the-art vulnerability scanning modules on regional TVET servers."
   },
   {
@@ -37,7 +47,7 @@ const STUDENTS: StudentSuccess[] = [
     course: "Civil & Structural Engineering",
     institution: "Eldoret National Polytechnic",
     company: "Bamburi Cement Ltd",
-    image: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&fit=crop&q=80",
+    image: studentImg3,
     story: "Automated critical dry-mix raw feed calculations, saving processing coordinates check cycles."
   },
   {
@@ -46,7 +56,7 @@ const STUDENTS: StudentSuccess[] = [
     course: "Food Science & Processing",
     institution: "Kabete National Polytechnic",
     company: "Brookside Dairy Group",
-    image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&fit=crop&q=80",
+    image: studentImg4,
     story: "Optimized quality assurance protocols, guaranteeing cold-chain safety for dairy regional logistics."
   },
   {
@@ -55,7 +65,7 @@ const STUDENTS: StudentSuccess[] = [
     course: "Automotive Technology & Design",
     institution: "Nyeri National Polytechnic",
     company: "Toyota East Africa",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&fit=crop&q=80",
+    image: studentImg5,
     story: "Designed diagnostic diagnostic logs for modern hybrid power-train assemblies."
   },
   {
@@ -64,7 +74,7 @@ const STUDENTS: StudentSuccess[] = [
     course: "Hospitality & Institutional Management",
     institution: "Sigalagala National Polytechnic",
     company: "Sarova Hotels & Resorts",
-    image: "https://images.unsplash.com/photo-1548142813-c348350df52b?w=400&fit=crop&q=80",
+    image: studentImg6,
     story: "Acquired first-class praise for implementing contactless guest check-ins using centralized QR logs."
   },
   {
@@ -73,7 +83,7 @@ const STUDENTS: StudentSuccess[] = [
     course: "Mechanical Engineering (Plant Option)",
     institution: "Meru National Polytechnic",
     company: "Davis & Shirtliff Ltd",
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&fit=crop&q=80",
+    image: studentImg7,
     story: "Led an off-grid solar-pump installation in high-density arid agricultural sectors."
   },
   {
@@ -82,26 +92,8 @@ const STUDENTS: StudentSuccess[] = [
     course: "Building Economics & Quantity Surveying",
     institution: "Kitale National Polytechnic",
     company: "Landmark Holdings Ltd",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&fit=crop&q=80",
+    image: studentImg8,
     story: "Analyzed material variance indices using cloud spreadsheets, shortening logistics delays."
-  },
-  {
-    id: 9,
-    name: "Lulu Adhiambo",
-    course: "Applied Biology & Bio-chemistry",
-    institution: "Kisii National Polytechnic",
-    company: "KEMRI (Kenya Medical Research)",
-    image: "https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=400&fit=crop&q=80",
-    story: "Conducted analysis on vaccine strain safety, earning institutional supervisor commendation."
-  },
-  {
-    id: 10,
-    name: "Chidi Waweru",
-    course: "Renewable Energy Engineering",
-    institution: "Kisii National Polytechnic",
-    company: "d.light Solar Africa Ltd",
-    image: "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=400&fit=crop&q=80",
-    story: "Commissioned pay-as-you-go micro-grid solar kits for sustainable rural community learning."
   }
 ];
 

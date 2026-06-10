@@ -17,25 +17,19 @@ import PlacementMap from './components/PlacementMap';
 import CapturePreviewMap from './components/CapturePreviewMap';
 import { LoginBackgroundSlideshow } from './components/LoginBackgroundSlideshow';
 
+// Import local images from the Images folder
+import bgImage1 from '../Images/images (1).jpeg';
+import bgImage2 from '../Images/images (2).jpeg';
+import bgImage3 from '../Images/images (3).jpeg';
+import bgImage4 from '../Images/images (4).jpeg';
+import bgImage5 from '../Images/images (5).jpeg';
+import bgImage6 from '../Images/images.jpeg';
+import bgImage7 from '../Images/1776760797230.jpeg';
+import bgImage8 from '../Images/mMzje.jpg';
+import mainLogo from '../LOGO.png';
+
 const KnpLogo = () => (
-  <svg viewBox="0 0 120 120" className="w-full h-full text-[#7B1C2E]" fill="none" xmlns="http://www.w3.org/2000/svg">
-    {/* Clean Maroon Shield Base */}
-    <path d="M60 10 L25 22 C25 55 45 88 60 110 C75 88 95 55 95 22 L60 10 Z" fill="#7B1C2E" />
-    <path d="M60 15 L30 25 C30 52 48 82 60 102 C72 82 90 52 90 25 L60 15 Z" fill="white" />
-    
-    {/* Gothic Style Brand Initials */}
-    <text x="60" y="44" fill="#7B1C2E" fontSize="16" fontWeight="bold" textAnchor="middle" fontFamily="Georgia, serif">KNP</text>
-    
-    {/* Isometric Graduation Cap (Mortarboard) */}
-    <path d="M60 52 L85 60 L60 68 L35 60 Z" fill="#7B1C2E" />
-    <path d="M47 64 V74 C47 77 60 79 60 79 C60 79 73 77 73 74 V64" stroke="#7B1C2E" strokeWidth="2.5" fill="none" />
-    <path d="M76 60 V71" stroke="#7B1C2E" strokeWidth="1.5" />
-    <circle cx="76" cy="71" r="2" fill="#7B1C2E" />
-    
-    {/* Scroll/Banner */}
-    <path d="M22 84 C30 81 90 81 98 84 L98 94 C90 91 30 91 22 94 Z" fill="#7B1C2E" />
-    <text x="60" y="90" fill="white" fontSize="4.2" fontWeight="900" textAnchor="middle" fontFamily="sans-serif" letterSpacing="0.15">KITALE POLYTECHNIC</text>
-  </svg>
+  <img src={mainLogo} alt="Kitale National Polytechnic Logo" className="w-full h-full object-contain" />
 );
 
 // Alert banner helper
@@ -107,59 +101,44 @@ function RotatingTypingText() {
 
 const backgroundImages = [
   {
-    url: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?auto=format&fit=crop&q=80&w=1200",
-    role: "Medical Student / Doctor",
-    desc: "Healthcare & Therapeutics Track"
-  },
-  {
-    url: "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=1200",
-    role: "Software Engineer & Trainee",
-    desc: "Computer Science & IT Track"
-  },
-  {
-    url: "https://images.unsplash.com/photo-1594824813573-246434de83fb?auto=format&fit=crop&q=80&w=1200",
-    role: "Doctor & Medical Scholar",
-    desc: "Healthcare & Therapeutics Track"
-  },
-  {
-    url: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?auto=format&fit=crop&q=80&w=1200",
-    role: "TVET Technical Educator",
-    desc: "Academic Mentorship & Guidance"
-  },
-  {
-    url: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=1200",
-    role: "Civil Engineering Supervisor",
-    desc: "Safety Protocols & Worksite Operations"
-  },
-  {
-    url: "https://images.unsplash.com/photo-1530210124550-912dc1381cb8?auto=format&fit=crop&q=80&w=1200",
-    role: "Laboratory Scientist",
-    desc: "Applied Biology & Chemistry Track"
-  },
-  {
-    url: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&q=80&w=1200",
+    url: bgImage1,
     role: "Collaborative Study Group",
     desc: "Trainee Peer Review & Innovation"
   },
   {
-    url: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&q=80&w=1200",
+    url: bgImage2,
+    role: "Software Engineer & Trainee",
+    desc: "Computer Science & IT Track"
+  },
+  {
+    url: bgImage3,
+    role: "Civil Engineering Supervisor",
+    desc: "Safety Protocols & Worksite Operations"
+  },
+  {
+    url: bgImage4,
+    role: "TVET Technical Educator",
+    desc: "Academic Mentorship & Guidance"
+  },
+  {
+    url: bgImage5,
     role: "Electrical & Hardware Technician",
     desc: "Mechatronics & Electronics Track"
   },
   {
-    url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=1200",
+    url: bgImage6,
     role: "Infrastructure Architect",
     desc: "Structural Design & Drafting"
   },
   {
-    url: "https://images.unsplash.com/photo-1593113598332-cd288d649433?auto=format&fit=crop&q=80&w=1200",
-    role: "Bio-Tech Agronomist Analyst",
-    desc: "Agricultural Sciences & Engineering"
+    url: bgImage7,
+    role: "Medical Student / Doctor",
+    desc: "Healthcare & Therapeutics Track"
   },
   {
-    url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=1200",
-    role: "Senior Engineering Project Director",
-    desc: "Industrial Management Track"
+    url: bgImage8,
+    role: "Bio-Tech Agronomist Analyst",
+    desc: "Agricultural Sciences & Engineering"
   }
 ];
 
@@ -1543,7 +1522,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen bg-[#F7F8FA] font-sans flex flex-col antialiased ${!currentUser ? 'h-screen max-h-screen overflow-hidden' : ''}`}>
+    <div className="min-h-screen bg-[#F7F8FA] font-sans flex flex-col antialiased">
       {/* Top Header */}
       {currentUser && (
         <header className="h-16 bg-white border-b border-[#E8E8E8] flex items-center justify-between px-4 sm:px-6 sticky top-0 z-40">
@@ -1683,10 +1662,10 @@ export default function App() {
 
       {/* Main Core Router */}
       {!currentUser ? (
-        <div className="flex-1 flex items-center justify-center lg:justify-end h-screen max-h-screen w-full relative bg-[#120204] py-4 px-4 lg:pr-24 xl:pr-40 selection:bg-[#7B1C2E]/20 selection:text-white overflow-hidden">
+        <div className="flex-1 flex items-center justify-center lg:justify-end min-h-screen w-full relative bg-[#120204] py-8 px-4 lg:pr-24 xl:pr-40 selection:bg-[#7B1C2E]/20 selection:text-white overflow-y-auto">
           
           {/* Background Images with presentation-style transitions */}
-          <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+          <div className="fixed inset-0 w-full h-full z-0 overflow-hidden">
             {backgroundImages.map((img, idx) => (
               <div
                 key={idx}
@@ -1705,16 +1684,16 @@ export default function App() {
           </div>
  
           {/* Dynamic Rich Maroon Tint Overlay & Gradient Wash */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#500A0A]/90 via-[#250105]/50 to-[#120204]/40 z-10 pointer-events-none"></div>
+          <div className="fixed inset-0 bg-gradient-to-t from-[#500A0A]/90 via-[#250105]/50 to-[#120204]/40 z-10 pointer-events-none"></div>
  
           {/* Ambient Soft Red/Maroon Spotlights that pulse slowly behind */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none z-10 select-none">
+          <div className="fixed inset-0 overflow-hidden pointer-events-none z-10 select-none">
             <div className="absolute -top-[30%] -left-[10%] w-[60%] h-[60%] rounded-full bg-[#7B1C2E]/20 blur-[130px] mix-blend-screen animate-pulse" style={{ animationDuration: '9s' }}></div>
             <div className="absolute -bottom-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-[#500A0A]/30 blur-[110px] mix-blend-screen animate-pulse" style={{ animationDuration: '12s' }}></div>
           </div>
  
           {/* Dynamic high-fidelity glassmorphism container in the left highlight box */}
-          <div className="absolute bottom-72 left-8 lg:left-12 xl:left-24 z-20 hidden lg:flex flex-col gap-2 backdrop-blur-xl bg-black/25 border border-white/10 rounded-2xl py-4 px-5 w-[25rem] xl:w-[30rem] transition-all duration-1000 shadow-[0_8px_32px_rgba(0,0,0,0.5)] select-none text-left">
+          <div className="fixed bottom-72 left-8 lg:left-12 xl:left-24 z-20 hidden lg:flex flex-col gap-2 backdrop-blur-xl bg-black/25 border border-white/10 rounded-2xl py-4 px-5 w-[25rem] xl:w-[30rem] transition-all duration-1000 shadow-[0_8px_32px_rgba(0,0,0,0.5)] select-none text-left">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 relative">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
@@ -1728,10 +1707,10 @@ export default function App() {
               </h3>
             </div>
           </div>
-          <div className="w-full max-w-md bg-white border border-gray-200/80 rounded-2xl p-6 sm:p-8 shadow-2xl relative z-20 transition-all duration-500">
+          <div className="w-full max-w-md bg-white border border-gray-200/80 rounded-2xl p-5 sm:p-6 shadow-2xl relative z-20 transition-all duration-500">
             <div className="flex flex-col items-center text-center mb-5 select-none">
-              <div className="w-12 h-12 bg-[#7B1C2E] rounded-full flex items-center justify-center p-2.5 shadow-md mb-3">
-                <Shield className="w-7 h-7 text-white fill-white/10" />
+              <div className="w-14 h-14 bg-white border border-[#7B1C2E]/20 rounded-full flex items-center justify-center p-1.5 shadow-md mb-3 overflow-hidden">
+                <KnpLogo />
               </div>
               <h2 className="text-[13px] font-black uppercase tracking-wider text-[#7B1C2E] leading-tight text-center">
                 THE KITALE NATIONAL POLYTECHNIC
@@ -1769,11 +1748,11 @@ export default function App() {
 
                   {/* ROLE TOGGLE segmented control */}
                   <div>
-                    <div className="grid grid-cols-4 gap-1 bg-[#F3F4F6] p-1 rounded-full w-full">
+                    <div className="grid grid-cols-4 gap-1 bg-[#F3F4F6] p-0.5 rounded-full w-full">
                       <button
                         type="button"
                         onClick={() => handleRoleSelect('STUDENT')}
-                        className={`py-2 px-1 text-center text-[9px] md:text-[10px] font-black uppercase rounded-full transition-all duration-200 cursor-pointer ${
+                        className={`py-1.5 px-1 text-center text-[9px] md:text-[10px] font-black uppercase rounded-full transition-all duration-200 cursor-pointer ${
                           selectedRoleTab === 'STUDENT'
                             ? 'bg-white text-gray-950 shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
@@ -1784,7 +1763,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => handleRoleSelect('ASSESSOR')}
-                        className={`py-2 px-1 text-center text-[9px] md:text-[10px] font-black uppercase rounded-full transition-all duration-200 cursor-pointer ${
+                        className={`py-1.5 px-1 text-center text-[9px] md:text-[10px] font-black uppercase rounded-full transition-all duration-200 cursor-pointer ${
                           selectedRoleTab === 'ASSESSOR'
                             ? 'bg-white text-gray-950 shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
@@ -1795,7 +1774,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => handleRoleSelect('SUPERVISOR')}
-                        className={`py-2 px-1 text-center text-[9px] md:text-[10px] font-black uppercase rounded-full transition-all duration-200 cursor-pointer ${
+                        className={`py-1.5 px-1 text-center text-[9px] md:text-[10px] font-black uppercase rounded-full transition-all duration-200 cursor-pointer ${
                           selectedRoleTab === 'SUPERVISOR'
                             ? 'bg-white text-gray-950 shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
@@ -1806,7 +1785,7 @@ export default function App() {
                       <button
                         type="button"
                         onClick={() => handleRoleSelect('ADMIN')}
-                        className={`py-2 px-1 text-center text-[9px] md:text-[10px] font-black uppercase rounded-full transition-all duration-200 cursor-pointer ${
+                        className={`py-1.5 px-1 text-center text-[9px] md:text-[10px] font-black uppercase rounded-full transition-all duration-200 cursor-pointer ${
                           selectedRoleTab === 'ADMIN'
                             ? 'bg-white text-gray-950 shadow-sm'
                             : 'text-gray-500 hover:text-gray-700'
@@ -1819,14 +1798,14 @@ export default function App() {
 
                   {/* INSTITUTIONAL EMAIL field */}
                   <div>
-                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
                       INSTITUTIONAL EMAIL
                     </label>
                     <input 
                       type="email" 
                       value={loginEmail} 
                       onChange={(e) => setLoginEmail(e.target.value)}
-                      className="w-full h-[52px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors" 
+                      className="w-full h-[45px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors" 
                       placeholder="name@polytechnic.ac.ke"
                       required
                     />
@@ -1834,7 +1813,7 @@ export default function App() {
 
                   {/* PASSPHRASE field */}
                   <div>
-                    <div className="flex items-center justify-between mb-1.5">
+                    <div className="flex items-center justify-between mb-1">
                       <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider">
                         PASSPHRASE
                       </label>
@@ -1851,7 +1830,7 @@ export default function App() {
                         type={showLoginPassword ? "text" : "password"} 
                         value={loginPassword} 
                         onChange={(e) => setLoginPassword(e.target.value)}
-                        className="w-full h-[52px] pl-4 pr-12 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors" 
+                        className="w-full h-[45px] pl-4 pr-12 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors" 
                         placeholder="••••••••"
                         required
                       />
@@ -1867,7 +1846,7 @@ export default function App() {
                   </div>
 
                   {/* REMEMBER ME CHECKBOX ROW */}
-                  <div className="flex items-start gap-2.5 py-1">
+                  <div className="flex items-start gap-2.5 py-0.5">
                     <input 
                       type="checkbox" 
                       id="remember-me"
@@ -1878,7 +1857,7 @@ export default function App() {
                       <label htmlFor="remember-me" className="block text-[11px] font-bold text-gray-800 uppercase tracking-wider leading-none select-none">
                         REMEMBER ME
                       </label>
-                      <span className="text-[10px] text-gray-400 font-bold block mt-1 uppercase tracking-wider leading-none">
+                      <span className="text-[9px] text-gray-400 font-bold block mt-1 uppercase tracking-wider leading-none">
                         PERSISTENT SESSION KEY
                       </span>
                     </div>
@@ -1887,7 +1866,7 @@ export default function App() {
                   {/* PRIMARY BUTTON */}
                   <button 
                     type="submit"
-                    className="w-full h-[52px] bg-[#6B1020] hover:bg-[#8C1D2F] text-white font-bold text-xs uppercase tracking-[0.15em] rounded-lg shadow-sm hover:shadow active:scale-[0.99] transition-all cursor-pointer"
+                    className="w-full h-[45px] bg-[#6B1020] hover:bg-[#8C1D2F] text-white font-bold text-xs uppercase tracking-[0.15em] rounded-lg shadow-sm hover:shadow active:scale-[0.99] transition-all cursor-pointer"
                   >
                     AUTHORIZE ACCESS
                   </button>
@@ -1911,34 +1890,34 @@ export default function App() {
                 <form 
                   onSubmit={handleSignUp} 
                   id="signup-form" 
-                  className="space-y-4"
+                  className="space-y-3"
                 >
                   <div>
-                    <h3 className="text-2xl md:text-3xl font-bold text-[#1a1a1a] tracking-tight leading-tight">
+                    <h3 className="text-xl md:text-2xl font-bold text-[#1a1a1a] tracking-tight leading-tight">
                       Request Access
                     </h3>
-                    <p className="text-gray-500 text-xs md:text-sm mt-1">
-                      Register your institutional credentials to enroll.
+                    <p className="text-gray-500 text-xs mt-1">
+                      Register your credentials to request an account.
                     </p>
                   </div>
 
                   {errorMsg && (
-                    <div className="p-3 bg-red-50 text-red-700 rounded-lg text-xs font-semibold border border-red-100 flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                    <div className="p-2.5 bg-red-50 text-red-700 rounded-lg text-xs font-semibold border border-red-100 flex items-center gap-2">
+                      <AlertCircle className="w-3.5 h-3.5 text-red-600 shrink-0" />
                       <span>{errorMsg}</span>
                     </div>
                   )}
 
                   {/* Full Name field */}
                   <div>
-                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
                       FULL NAME
                     </label>
                     <input 
                       type="text" 
                       value={signUpFullName} 
                       onChange={(e) => setSignUpFullName(e.target.value)}
-                      className="w-full h-[52.5px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors" 
+                      className="w-full h-[45px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors" 
                       placeholder="e.g. John Mwangi"
                       required
                     />
@@ -1946,14 +1925,14 @@ export default function App() {
 
                   {/* Institutional Email field */}
                   <div>
-                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
                       INSTITUTIONAL EMAIL
                     </label>
                     <input 
                       type="email" 
                       value={signUpEmail} 
                       onChange={(e) => setSignUpEmail(e.target.value)}
-                      className="w-full h-[52.5px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors" 
+                      className="w-full h-[45px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors" 
                       placeholder="name@knpss.ac.ke"
                       required
                     />
@@ -1961,14 +1940,14 @@ export default function App() {
 
                   {/* Phone Number field */}
                   <div>
-                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
                       PHONE NUMBER (SMS ALERTS)
                     </label>
                     <input 
                       type="text" 
                       value={signUpPhone} 
                       onChange={(e) => setSignUpPhone(e.target.value)}
-                      className="w-full h-[52.5px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors" 
+                      className="w-full h-[45px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors" 
                       placeholder="e.g. +254712345678"
                       required
                     />
@@ -1976,13 +1955,13 @@ export default function App() {
 
                   {/* Role field */}
                   <div>
-                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">
+                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
                       SELECT SYSTEM ROLE
                     </label>
                     <select 
                       value={signUpRole} 
                       onChange={(e) => setSignUpRole(e.target.value as UserRole)}
-                      className="w-full h-[52px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors"
+                      className="w-full h-[45px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors"
                     >
                       <option value="TRAINEE">Enrolled Trainee / Student</option>
                       <option value="SUPERVISOR">Industry Host Supervisor</option>
@@ -1993,7 +1972,7 @@ export default function App() {
                   {/* Create Account primary button */}
                   <button 
                     type="submit"
-                    className="w-full h-[52px] bg-[#6B1020] hover:bg-[#8C1D2F] text-white font-bold text-xs uppercase tracking-[0.1em] rounded-lg active:scale-[0.99] transition mt-2 cursor-pointer"
+                    className="w-full h-[45px] bg-[#6B1020] hover:bg-[#8C1D2F] text-white font-bold text-xs uppercase tracking-[0.1em] rounded-lg active:scale-[0.99] transition mt-1.5 cursor-pointer"
                   >
                     CREATE ACCOUNT & LOGIN
                   </button>
