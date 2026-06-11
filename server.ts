@@ -3,11 +3,21 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import dotenv from 'dotenv';
 import express from 'express';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
+import crypto from 'crypto';
 import { createServer as createViteServer } from 'vite';
+import { Resend } from 'resend';
+
+// Load environment variables
+const envResult = dotenv.config({ path: path.join(process.cwd(), '.env.local') });
+if (envResult.error) {
+  console.warn('Warning: .env.local file not loaded:', envResult.error);
+}
+
 import { 
   User, TraineeProfile, OfficerProfile, SupervisorProfile, AdminProfile,
   Placement, LogbookEntry, Assessment, InstitutionalDocument, DocumentEntitlement, 
@@ -21,6 +31,32 @@ const DATA_DIR = isVercel ? path.join(os.tmpdir(), 'knpss_data') : path.join(pro
 const UPLOADS_DIR = isVercel ? path.join(os.tmpdir(), 'uploads') : path.join(process.cwd(), 'uploads');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 const SEED_DB_FILE = path.join(process.cwd(), 'data', 'db.json');
+
+// Initialize Resend client
+const resend = new Resend(process.env.RESEND_API_KEY);
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev';
+
+// OTP Store: Map of email -> { code, expiresAt }
+const otpStore = new Map<string, { code: string; expiresAt: number }>();
+
+// Reset Token Store: Map of resetToken -> { email, expiresAt }
+const resetTokenStore = new Map<string, { email: string; expiresAt: number }>();
+
+// Clean up expired OTPs every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [email, otp] of otpStore.entries()) {
+    if (otp.expiresAt < now) {
+      otpStore.delete(email);
+    }
+  }
+  // Clean up expired reset tokens
+  for (const [token, data] of resetTokenStore.entries()) {
+    if (data.expiresAt < now) {
+      resetTokenStore.delete(token);
+    }
+  }
+}, 5 * 60 * 1000);
 
 // Ensure data folder exists
 if (!fs.existsSync(DATA_DIR)) {
@@ -64,13 +100,14 @@ let db = {
 
 // Seed Helper
 function seedDatabase() {
-  // 1. Seed Users (passwords are stored as plain text "password" for developer ease)
+  // 1. Seed Users (passwords are stored as hashed values; default seeded password is "password")
   const users: User[] = [
     {
       id: "u-trainee-1",
       role: "TRAINEE",
       fullName: "Joseph Kurian",
       email: "trainee@knpss.ac.ke",
+      passwordHash: hashPassword('password'),
       phone: "+254712345678",
       profilePhotoUrl: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
       isActive: true,
@@ -84,6 +121,7 @@ function seedDatabase() {
       role: "TRAINEE",
       fullName: "Mary Wambui",
       email: "mary.wambui@knpss.ac.ke",
+      passwordHash: hashPassword('password'),
       phone: "+254722111222",
       profilePhotoUrl: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&auto=format&fit=crop&q=80",
       isActive: true,
@@ -96,6 +134,7 @@ function seedDatabase() {
       role: "TRAINEE",
       fullName: "David Kimani",
       email: "david.kimani@knpss.ac.ke",
+      passwordHash: hashPassword('password'),
       phone: "+254733444555",
       profilePhotoUrl: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&auto=format&fit=crop&q=80",
       isActive: true,
@@ -108,6 +147,7 @@ function seedDatabase() {
       role: "TRAINEE",
       fullName: "Faith Mutua",
       email: "faith.mutua@knpss.ac.ke",
+      passwordHash: hashPassword('password'),
       phone: "+254722999000",
       profilePhotoUrl: "https://images.unsplash.com/photo-1534751516642-a131fed10495?w=120&auto=format&fit=crop&q=80",
       isActive: true,
@@ -120,6 +160,7 @@ function seedDatabase() {
       role: "OFFICER",
       fullName: "Mary Wanjiku",
       email: "officer@knpss.ac.ke",
+      passwordHash: hashPassword('password'),
       phone: "+254799000111",
       profilePhotoUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&auto=format&fit=crop&q=80",
       isActive: true,
@@ -132,6 +173,7 @@ function seedDatabase() {
       role: "SUPERVISOR",
       fullName: "John Mwangi",
       email: "supervisor@corporates.com",
+      passwordHash: hashPassword('password'),
       phone: "+254711223344",
       profilePhotoUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=120&auto=format&fit=crop&q=80",
       isActive: true,
@@ -661,6 +703,10 @@ function saveToDisk() {
   fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2), 'utf-8');
 }
 
+function hashPassword(password: string) {
+  return crypto.createHash('sha256').update(String(password)).digest('hex');
+}
+
 function loadFromDisk() {
   if (fs.existsSync(DB_FILE)) {
     try {
@@ -742,68 +788,39 @@ async function sendSMS(phoneNumber: string, message: string) {
 
 // 9.1 Authentication Endpoints
 app.post('/api/v1/auth/login', (req, res) => {
-  const { email, password } = req.get('content-type')?.includes('application/json') ? req.body : req.query; // satisfy any login method
-  const userEmail = email || req.body?.email;
-  
-  if (!userEmail) {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
     return res.status(400).json({
       type: "about:blank",
       title: "Bad Request",
       status: 400,
-      detail: "Email address is required"
+      detail: "Email and password are required"
     });
   }
 
-  let user = db.users.find(u => u.email.toLowerCase() === userEmail.toLowerCase());
-  
-  // if student doesn't exist, register them on the fly & add credentials to the Directory!
+  const user = db.users.find(u => u.email.toLowerCase() === String(email).toLowerCase());
   if (!user) {
-    const namePrefix = userEmail.split('@')[0];
-    const fullName = namePrefix.charAt(0).toUpperCase() + namePrefix.slice(1).replace(/[\._]/g, ' ');
-    
-    user = {
-      id: `u-${Math.random().toString(36).substr(2, 9)}`,
-      role: 'TRAINEE',
-      fullName,
-      email: userEmail.toLowerCase(),
-      phone: '',
-      profilePhotoUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80",
-      isActive: true,
-      isApprovedForLogin: false, // Default: restricted until Approved permanently by Liaison Admin
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    };
-    db.users.push(user);
-
-    // Also bootstrap matching Trainee Profile
-    const admissionNo = `KNPSS/ADMIT/${new Date().getFullYear()}/${Math.floor(1000 + Math.random() * 9000)}`;
-    const tp: TraineeProfile = {
-      id: `tp-${Math.random().toString(36).substr(2, 9)}`,
-      userId: user.id,
-      admissionNo,
-      courseCode: "DICT",
-      courseName: "Diploma in Information Communication Technology",
-      cohort: "2024 Intake",
-      attachmentDurationWeeks: db.systemSettings.attachmentDurationWeeks,
-      eligibilityStatus: "PENDING",
-      feePaid: false,
-      createdAt: new Date().toISOString()
-    };
-    db.traineeProfiles.push(tp);
-    
-    logAudit(user.id, "AUTO_SIGNUP_ON_LOGIN", "USER", user.id, undefined, user, req.ip);
-    saveToDisk();
-
-    return res.status(403).json({
+    return res.status(401).json({
       type: "about:blank",
-      title: "Approval Pending",
-      status: 403,
-      detail: "Your student credentials have been added to the Enrolled Trainees Directory. Login is locked pending mandatory Admin approval."
+      title: "Unauthorized",
+      status: 401,
+      detail: "Invalid login credentials"
     });
   }
-  
-  if (!user.isActive) {
+
+  const hashedPassword = hashPassword(String(password));
+  if (!user.passwordHash || user.passwordHash !== hashedPassword) {
     return res.status(401).json({
+      type: "about:blank",
+      title: "Unauthorized",
+      status: 401,
+      detail: "Invalid login credentials"
+    });
+  }
+
+  if (!user.isActive) {
+    return res.status(410).json({
       type: "about:blank",
       title: "Unauthorized",
       status: 410,
@@ -811,7 +828,6 @@ app.post('/api/v1/auth/login', (req, res) => {
     });
   }
 
-  // Mandatory directory verification check
   if (user.role === 'TRAINEE' && user.isApprovedForLogin === false) {
     return res.status(403).json({
       type: "about:blank",
@@ -821,13 +837,11 @@ app.post('/api/v1/auth/login', (req, res) => {
     });
   }
 
-  // Record login timestamp
   user.lastLoginAt = new Date().toISOString();
   saveToDisk();
 
   logAudit(user.id, "USER_LOGIN", "USER", user.id, undefined, undefined, req.ip);
 
-  // Return realistic OAuth session tokens
   res.json({
     accessToken: `at_jwt_${user.id}_${Math.random().toString(36).substr(2, 9)}`,
     user: {
@@ -844,16 +858,30 @@ app.post('/api/v1/auth/login', (req, res) => {
 
 
 app.post('/api/v1/auth/signup', (req, res) => {
-  const { fullName, email, phone, role } = req.body;
+  const { fullName, email, phone, role, password, confirmPassword } = req.body;
 
-  if (!fullName || !email) {
+  if (!fullName || !email || !phone || !password || !confirmPassword) {
     return res.status(400).json({
       title: "Bad Request",
-      detail: "Full Name and Email are required fields"
+      detail: "Full Name, Email, Phone, and Password are required fields"
     });
   }
 
-  const existingUser = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
+  if (String(password).length < 8) {
+    return res.status(400).json({
+      title: "Bad Request",
+      detail: "Password must be at least 8 characters long"
+    });
+  }
+
+  if (password !== confirmPassword) {
+    return res.status(400).json({
+      title: "Bad Request",
+      detail: "Password and confirmation do not match"
+    });
+  }
+
+  const existingUser = db.users.find(u => u.email.toLowerCase() === String(email).toLowerCase());
   if (existingUser) {
     return res.status(400).json({
       title: "Bad Request",
@@ -867,11 +895,12 @@ app.post('/api/v1/auth/signup', (req, res) => {
     id: `u-${Math.random().toString(36).substr(2, 9)}`,
     role: userRole,
     fullName,
-    email: email.toLowerCase(),
+    email: String(email).toLowerCase(),
+    passwordHash: hashPassword(String(password)),
     phone: phone || '',
     profilePhotoUrl: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80",
     isActive: true,
-    isApprovedForLogin: userRole === 'TRAINEE' ? false : true, // Lock trainee log until Admin checks
+    isApprovedForLogin: true,
     lastLoginAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString()
@@ -924,6 +953,108 @@ app.delete('/api/v1/auth/logout', (req, res) => {
   res.status(200).send("OK");
 });
 
+app.post('/api/v1/auth/send-otp', async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ title: "Bad Request", detail: "Email is required" });
+    }
+
+    const emailLower = email.toLowerCase();
+    
+    // Generate 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    
+    // Store OTP with 10-minute expiry
+    const expiresAt = Date.now() + 10 * 60 * 1000;
+    otpStore.set(emailLower, { code: otp, expiresAt });
+    
+    // Send via Resend
+    if (process.env.RESEND_API_KEY) {
+      try {
+        const resendResult = await resend.emails.send({
+          from: RESEND_FROM_EMAIL,
+          to: emailLower,
+          subject: 'KNPSS AssessLink - Email Verification Code',
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+              <h2>Email Verification</h2>
+              <p>Your verification code is:</p>
+              <div style="background: #f0f0f0; padding: 20px; text-align: center; border-radius: 8px; margin: 20px 0;">
+                <h1 style="letter-spacing: 5px; color: #333; margin: 0;">${otp}</h1>
+              </div>
+              <p>This code expires in 10 minutes. Do not share this code with anyone.</p>
+              <p style="color: #999; font-size: 12px;">If you did not request this code, please ignore this email.</p>
+            </div>
+          `
+        });
+        console.log('Resend send-otp result:', resendResult);
+      } catch (emailError) {
+        console.error('Resend send-otp error:', emailError);
+        return res.status(500).json({ title: 'Email Error', detail: 'Failed to send OTP email. Please check your Resend settings.' });
+      }
+    } else {
+      return res.status(500).json({ title: 'Email Config Error', detail: 'RESEND_API_KEY not configured.' });
+    }
+    
+    res.json({ 
+      message: "OTP sent to your email.",
+      email: emailLower,
+      expiresIn: 600, // seconds
+      otp: otp // included for dev debugging
+    });
+  } catch (error) {
+    console.error('Send OTP error:', error);
+    res.status(500).json({ title: "Server Error", detail: "Failed to send OTP" });
+  }
+});
+
+app.post('/api/v1/auth/verify-otp', (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    
+    if (!email || !otp) {
+      return res.status(400).json({ title: "Bad Request", detail: "Email and OTP are required" });
+    }
+
+    const emailLower = email.toLowerCase();
+    const storedOtp = otpStore.get(emailLower);
+    
+    if (!storedOtp) {
+      return res.status(400).json({ title: "Invalid", detail: "OTP not found. Please request a new one." });
+    }
+    
+    // Check expiration
+    if (storedOtp.expiresAt < Date.now()) {
+      otpStore.delete(emailLower);
+      return res.status(400).json({ title: "Expired", detail: "OTP has expired. Please request a new one." });
+    }
+    
+    // Check code
+    if (storedOtp.code !== otp.toString()) {
+      return res.status(400).json({ title: "Invalid", detail: "Incorrect OTP. Please try again." });
+    }
+    
+    // Valid OTP - remove it from store
+    otpStore.delete(emailLower);
+    
+    // Generate reset token with 30-minute expiry
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiresAt = Date.now() + 30 * 60 * 1000;
+    resetTokenStore.set(resetToken, { email: emailLower, expiresAt: resetTokenExpiresAt });
+    
+    res.json({ 
+      message: "OTP verified successfully",
+      resetToken: resetToken,
+      email: emailLower
+    });
+  } catch (error) {
+    console.error('Verify OTP error:', error);
+    res.status(500).json({ title: "Server Error", detail: "Failed to verify OTP" });
+  }
+});
+
 app.post('/api/v1/auth/forgot-password', async (req, res) => {
   const { email } = req.body;
   const user = db.users.find(u => u.email.toLowerCase() === email?.toLowerCase());
@@ -931,7 +1062,11 @@ app.post('/api/v1/auth/forgot-password', async (req, res) => {
     return res.status(404).json({ title: "Not Found", detail: "Email not discovered" });
   }
 
-  const otp = Math.floor(100000 + Math.random() * 90000).toString();
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  // Store OTP with 10-minute expiry
+  const expiresAt = Date.now() + 10 * 60 * 1000;
+  otpStore.set(email.toLowerCase(), { code: otp, expiresAt });
+  
   // Simulate dispatching via Email + Africa's Talking
   if (user.phone) {
     await sendSMS(user.phone, `Your KNPSS Link password reset code is ${otp}. Expires in 10 minutes. Do not share.`);
@@ -942,14 +1077,48 @@ app.post('/api/v1/auth/forgot-password', async (req, res) => {
   res.json({ message: "OTP sent to your email and phone number.", simulatedOtp: otp });
 });
 
-app.post('/api/v1/auth/verify-otp', (req, res) => {
-  const { otp } = req.body;
-  // Let any 6-digit code pass in development mode, or match
-  res.json({ resetToken: `reset_token_verified_${Math.random()}` });
-});
-
 app.post('/api/v1/auth/reset-password', (req, res) => {
-  res.json({ status: "success", detail: "Password resets finalized successfully." });
+  try {
+    const { resetToken, newPassword } = req.body;
+    
+    if (!resetToken || !newPassword) {
+      return res.status(400).json({ title: "Bad Request", detail: "Reset token and new password are required" });
+    }
+    
+    // Verify reset token
+    const tokenData = resetTokenStore.get(resetToken);
+    if (!tokenData) {
+      return res.status(400).json({ title: "Invalid", detail: "Reset token not found. Please request a new one." });
+    }
+    
+    // Check token expiration
+    if (tokenData.expiresAt < Date.now()) {
+      resetTokenStore.delete(resetToken);
+      return res.status(400).json({ title: "Expired", detail: "Reset token has expired. Please request a new one." });
+    }
+    
+    // Find user and update password
+    const user = db.users.find(u => u.email.toLowerCase() === tokenData.email.toLowerCase());
+    if (!user) {
+      return res.status(404).json({ title: "Not Found", detail: "User not found" });
+    }
+    
+    // Update password
+    user.passwordHash = hashPassword(newPassword);
+    user.updatedAt = new Date().toISOString();
+    
+    // Clean up reset token
+    resetTokenStore.delete(resetToken);
+    
+    // Save to disk and audit log
+    saveToDisk();
+    logAudit(user.id, "PASSWORD_RESET_COMPLETED", "USER", user.id, undefined, undefined, req.ip);
+    
+    res.json({ status: "success", message: "Password reset successfully. You can now login with your new password." });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ title: "Server Error", detail: "Failed to reset password" });
+  }
 });
 
 

@@ -9,7 +9,7 @@
       "profilePhotoUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
       "isActive": true,
       "isApprovedForLogin": true,
-      "lastLoginAt": "2026-06-10T12:32:50.873Z",
+      "lastLoginAt": "2026-06-11T08:05:13.128Z",
       "createdAt": "2026-05-11T12:18:18.399Z",
       "updatedAt": "2026-06-10T12:18:18.399Z"
     },
@@ -59,7 +59,8 @@
       "isActive": true,
       "isApprovedForLogin": true,
       "createdAt": "2026-04-11T12:18:18.399Z",
-      "updatedAt": "2026-06-10T12:18:18.399Z"
+      "updatedAt": "2026-06-10T12:18:18.399Z",
+      "lastLoginAt": "2026-06-11T08:05:24.047Z"
     },
     {
       "id": "u-supervisor-1",
@@ -71,7 +72,8 @@
       "isActive": true,
       "isApprovedForLogin": true,
       "createdAt": "2026-05-01T12:18:18.399Z",
-      "updatedAt": "2026-06-10T12:18:18.399Z"
+      "updatedAt": "2026-06-10T12:18:18.399Z",
+      "lastLoginAt": "2026-06-11T07:38:59.817Z"
     },
     {
       "id": "u-admin-1",
@@ -84,7 +86,34 @@
       "isApprovedForLogin": true,
       "createdAt": "2026-03-12T12:18:18.399Z",
       "updatedAt": "2026-06-10T12:18:18.399Z",
-      "lastLoginAt": "2026-06-10T12:32:40.695Z"
+      "lastLoginAt": "2026-06-11T08:27:16.985Z"
+    },
+    {
+      "id": "u-oxl6cte4k",
+      "role": "TRAINEE",
+      "fullName": "Joseph Njiraini Kuria",
+      "email": "joenjiraini008@gmail.com",
+      "phone": "+254708534202",
+      "profilePhotoUrl": "blob:https://musical-space-tribble-6v9wrqxgpjfxwvx-3000.app.github.dev/7b48e63e-d584-43d7-8159-a0e7197a3ba6",
+      "isActive": true,
+      "isApprovedForLogin": false,
+      "lastLoginAt": "2026-06-11T09:12:52.636Z",
+      "createdAt": "2026-06-11T09:12:52.636Z",
+      "updatedAt": "2026-06-11T09:13:19.534Z"
+    },
+    {
+      "id": "u-5p7gsqwnx",
+      "role": "TRAINEE",
+      "fullName": "Joseph Njiraini Kuria",
+      "email": "joeqush@gmail.com",
+      "passwordHash": "2735e8aa736639410aa7672406fe2f43eab44cfb73e08c7eccc4abaa89cc1ff2",
+      "phone": "+254708534202",
+      "profilePhotoUrl": "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80",
+      "isActive": true,
+      "isApprovedForLogin": true,
+      "lastLoginAt": "2026-06-11T09:58:43.488Z",
+      "createdAt": "2026-06-11T09:58:43.488Z",
+      "updatedAt": "2026-06-11T09:58:43.488Z"
     }
   ],
   "traineeProfiles": [
@@ -135,6 +164,30 @@
       "eligibilityStatus": "ELIGIBLE",
       "feePaid": true,
       "createdAt": "2026-05-12T12:18:18.399Z"
+    },
+    {
+      "id": "tp-ojclrajps",
+      "userId": "u-oxl6cte4k",
+      "admissionNo": "KNPSS/ADMIT/2026/7059",
+      "courseCode": "DICT",
+      "courseName": "Diploma in Information Communication Technology",
+      "cohort": "2024 Intake",
+      "attachmentDurationWeeks": 12,
+      "eligibilityStatus": "PENDING",
+      "feePaid": false,
+      "createdAt": "2026-06-11T09:12:52.636Z"
+    },
+    {
+      "id": "tp-7z63vy0nl",
+      "userId": "u-5p7gsqwnx",
+      "admissionNo": "KNPSS/ADMIT/2026/5988",
+      "courseCode": "DICT",
+      "courseName": "Diploma in Information Communication Technology",
+      "cohort": "2024 Intake",
+      "attachmentDurationWeeks": 12,
+      "eligibilityStatus": "PENDING",
+      "feePaid": false,
+      "createdAt": "2026-06-11T09:58:43.488Z"
     }
   ],
   "officerProfiles": [
@@ -468,6 +521,190 @@
     }
   ],
   "auditLogs": [
+    {
+      "id": "al-igfmv50vk",
+      "userId": "u-5p7gsqwnx",
+      "action": "USER_SIGNUP",
+      "entityType": "USER",
+      "entityId": "u-5p7gsqwnx",
+      "newValues": "{\"id\":\"u-5p7gsqwnx\",\"role\":\"TRAINEE\",\"fullName\":\"Joseph Njiraini Kuria\",\"email\":\"joeqush@gmail.com\",\"passwordHash\":\"2735e8aa736639410aa7672406fe2f43eab44cfb73e08c7eccc4abaa89cc1ff2\",\"phone\":\"+254708534202\",\"profilePhotoUrl\":\"https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80\",\"isActive\":true,\"isApprovedForLogin\":true,\"lastLoginAt\":\"2026-06-11T09:58:43.488Z\",\"createdAt\":\"2026-06-11T09:58:43.488Z\",\"updatedAt\":\"2026-06-11T09:58:43.488Z\"}",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T09:58:43.489Z"
+    },
+    {
+      "id": "al-0ellusmr1",
+      "userId": "u-oxl6cte4k",
+      "action": "USER_MODIFICATION",
+      "entityType": "USER",
+      "entityId": "u-oxl6cte4k",
+      "oldValues": "{\"id\":\"u-oxl6cte4k\",\"role\":\"TRAINEE\",\"fullName\":\"Joseph Njiraini Kuria\",\"email\":\"joenjiraini008@gmail.com\",\"phone\":\"+254708534202\",\"profilePhotoUrl\":\"https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80\",\"isActive\":true,\"isApprovedForLogin\":false,\"lastLoginAt\":\"2026-06-11T09:12:52.636Z\",\"createdAt\":\"2026-06-11T09:12:52.636Z\",\"updatedAt\":\"2026-06-11T09:12:52.636Z\"}",
+      "newValues": "{\"id\":\"u-oxl6cte4k\",\"role\":\"TRAINEE\",\"fullName\":\"Joseph Njiraini Kuria\",\"email\":\"joenjiraini008@gmail.com\",\"phone\":\"+254708534202\",\"profilePhotoUrl\":\"blob:https://musical-space-tribble-6v9wrqxgpjfxwvx-3000.app.github.dev/7b48e63e-d584-43d7-8159-a0e7197a3ba6\",\"isActive\":true,\"isApprovedForLogin\":false,\"lastLoginAt\":\"2026-06-11T09:12:52.636Z\",\"createdAt\":\"2026-06-11T09:12:52.636Z\",\"updatedAt\":\"2026-06-11T09:13:19.534Z\"}",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T09:13:19.534Z"
+    },
+    {
+      "id": "al-qi8ndzx3w",
+      "userId": "u-oxl6cte4k",
+      "action": "USER_SIGNUP",
+      "entityType": "USER",
+      "entityId": "u-oxl6cte4k",
+      "newValues": "{\"id\":\"u-oxl6cte4k\",\"role\":\"TRAINEE\",\"fullName\":\"Joseph Njiraini Kuria\",\"email\":\"joenjiraini008@gmail.com\",\"phone\":\"+254708534202\",\"profilePhotoUrl\":\"https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80\",\"isActive\":true,\"isApprovedForLogin\":false,\"lastLoginAt\":\"2026-06-11T09:12:52.636Z\",\"createdAt\":\"2026-06-11T09:12:52.636Z\",\"updatedAt\":\"2026-06-11T09:12:52.636Z\"}",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T09:12:52.636Z"
+    },
+    {
+      "id": "al-799zfke5l",
+      "userId": "u-admin-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-admin-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T08:27:16.986Z"
+    },
+    {
+      "id": "al-j42s8ze1v",
+      "userId": "u-officer-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-officer-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T08:05:24.048Z"
+    },
+    {
+      "id": "al-vu9uwdct9",
+      "userId": "u-trainee-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-trainee-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T08:05:13.128Z"
+    },
+    {
+      "id": "al-eegvje6kv",
+      "userId": "u-officer-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-officer-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:39:10.544Z"
+    },
+    {
+      "id": "al-3esnqtlli",
+      "userId": "u-supervisor-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-supervisor-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:38:59.818Z"
+    },
+    {
+      "id": "al-nuaodcpo5",
+      "userId": "u-admin-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-admin-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:38:44.857Z"
+    },
+    {
+      "id": "al-y74reju2r",
+      "userId": "u-trainee-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-trainee-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:37:56.635Z"
+    },
+    {
+      "id": "al-w34tywfca",
+      "userId": "u-supervisor-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-supervisor-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:37:41.779Z"
+    },
+    {
+      "id": "al-2dbvn0xta",
+      "userId": "u-trainee-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-trainee-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:37:38.797Z"
+    },
+    {
+      "id": "al-c4qy9ll1x",
+      "userId": "u-trainee-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-trainee-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:37:38.618Z"
+    },
+    {
+      "id": "al-nlpc58n3p",
+      "userId": "u-trainee-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-trainee-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:37:34.813Z"
+    },
+    {
+      "id": "al-pde3njnds",
+      "userId": "u-trainee-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-trainee-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:37:33.725Z"
+    },
+    {
+      "id": "al-u5efofbo7",
+      "userId": "u-trainee-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-trainee-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:37:33.567Z"
+    },
+    {
+      "id": "al-qz89hp1u0",
+      "userId": "u-trainee-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-trainee-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:37:33.155Z"
+    },
+    {
+      "id": "al-p3mw3ub4f",
+      "userId": "u-trainee-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-trainee-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:37:31.397Z"
+    },
+    {
+      "id": "al-kkvj0cxf1",
+      "userId": "u-trainee-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-trainee-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:37:30.991Z"
+    },
+    {
+      "id": "al-fv2kil30e",
+      "userId": "u-admin-1",
+      "action": "USER_LOGIN",
+      "entityType": "USER",
+      "entityId": "u-admin-1",
+      "ipAddress": "127.0.0.1",
+      "createdAt": "2026-06-11T07:36:58.026Z"
+    },
     {
       "id": "al-5tj9ug7e9",
       "userId": "u-trainee-1",

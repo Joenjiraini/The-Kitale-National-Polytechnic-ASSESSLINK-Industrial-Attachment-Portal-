@@ -285,6 +285,20 @@ export default function App() {
   const [isLifecycleExpanded, setIsLifecycleExpanded] = useState(false);
   const [isLogbookFormOpenMobile, setIsLogbookFormOpenMobile] = useState(false);
 
+  // Forgot Password states
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
+  const [forgotPasswordStep, setForgotPasswordStep] = useState<'email' | 'otp' | 'reset'>('email');
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState('');
+  const [forgotPasswordOtp, setForgotPasswordOtp] = useState('');
+  const [forgotPasswordNewPassword, setForgotPasswordNewPassword] = useState('');
+  const [forgotPasswordConfirmPassword, setForgotPasswordConfirmPassword] = useState('');
+  const [forgotPasswordResetToken, setForgotPasswordResetToken] = useState('');
+  const [forgotPasswordLoading, setForgotPasswordLoading] = useState(false);
+  const [forgotPasswordError, setForgotPasswordError] = useState('');
+  const [forgotPasswordSuccess, setForgotPasswordSuccess] = useState('');
+  const [showForgotNewPassword, setShowForgotNewPassword] = useState(false);
+  const [showForgotConfirmPassword, setShowForgotConfirmPassword] = useState(false);
+
   // Trainee Profile specific states
   const [profileToast, setProfileToast] = useState<string | null>(null);
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -300,7 +314,11 @@ export default function App() {
   const [signUpFullName, setSignUpFullName] = useState<string>('');
   const [signUpEmail, setSignUpEmail] = useState<string>('');
   const [signUpPhone, setSignUpPhone] = useState<string>('');
+  const [signUpPassword, setSignUpPassword] = useState<string>('');
+  const [signUpConfirmPassword, setSignUpConfirmPassword] = useState<string>('');
   const [signUpRole, setSignUpRole] = useState<UserRole>('TRAINEE');
+  const [showSignUpPassword, setShowSignUpPassword] = useState<boolean>(false);
+  const [showSignUpConfirmPassword, setShowSignUpConfirmPassword] = useState<boolean>(false);
   
   // Custom expandable properties for sections
   const [profilePersonalExpanded, setProfilePersonalExpanded] = useState(true);
@@ -497,6 +515,76 @@ export default function App() {
     } catch (err: any) {
       console.error("PDF generation failed:", err);
       alert("Could not generate report. Please try again.");
+    }
+  };
+
+  const handleDownloadAssignedTimelinePDF = () => {
+    try {
+      const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      let y = 15;
+
+      doc.setFontSize(16);
+      doc.setFont('Helvetica', 'bold');
+      doc.text('Assigned Students Attachment Timeline', 14, y);
+      y += 8;
+
+      doc.setFontSize(10);
+      doc.setFont('Helvetica', 'normal');
+      doc.text(`Generated: ${new Date().toLocaleString()}`, 14, y);
+      y += 10;
+
+      if (!placementsList || placementsList.length === 0) {
+        doc.text('No assigned students found.', 14, y);
+      } else {
+        const header = ['Student', 'Workplace', 'GPS Coords'];
+        const colWidths = [70, 70, 40];
+        const leftMargin = 14;
+
+        doc.setFont('Helvetica', 'bold');
+        doc.text(header[0], leftMargin, y);
+        doc.text(header[1], leftMargin + colWidths[0], y);
+        doc.text(header[2], leftMargin + colWidths[0] + colWidths[1], y);
+        y += 6;
+        doc.setDrawColor(200, 200, 200);
+        doc.line(leftMargin, y, 196, y);
+        y += 6;
+
+        doc.setFont('Helvetica', 'normal');
+
+        placementsList.forEach((item, index) => {
+          if (y > 280) {
+            doc.addPage();
+            y = 15;
+          }
+
+          const studentName = item.traineeUser?.fullName || 'Unknown Student';
+          const workplaceName = item.companyName || 'Unknown Workplace';
+          const coords = item.locationLat != null && item.locationLng != null ? `${item.locationLat.toFixed(5)}, ${item.locationLng.toFixed(5)}` : 'No Coords';
+
+          const studentLines = doc.splitTextToSize(studentName, colWidths[0]);
+          const workplaceLines = doc.splitTextToSize(workplaceName, colWidths[1]);
+          const maxLines = Math.max(studentLines.length, workplaceLines.length, 1);
+          const rowHeight = maxLines * 5 + 4;
+
+          if (y + rowHeight > 290) {
+            doc.addPage();
+            y = 15;
+          }
+
+          doc.text(studentLines, leftMargin, y);
+          doc.text(workplaceLines, leftMargin + colWidths[0], y);
+          doc.text(coords, leftMargin + colWidths[0] + colWidths[1], y);
+          y += rowHeight;
+
+          doc.setDrawColor(230, 230, 230);
+          doc.line(leftMargin, y - 2, 196, y - 2);
+        });
+      }
+
+      doc.save(`Assigned_Students_Timeline_${new Date().toISOString().slice(0, 10)}.pdf`);
+    } catch (err: any) {
+      console.error('Assigned timeline PDF failed:', err);
+      alert('Could not generate Assigned Students timeline PDF. Please try again.');
     }
   };
 
@@ -809,9 +897,162 @@ export default function App() {
     }
   };
 
+  // Forgot Password Handlers
+  const handleForgotPasswordSendOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotPasswordError('');
+    setForgotPasswordLoading(true);
+
+    if (!forgotPasswordEmail.trim()) {
+      setForgotPasswordError('Please enter your email address');
+      setForgotPasswordLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/v1/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotPasswordEmail })
+      });
+
+      if (res.ok) {
+        setForgotPasswordSuccess('OTP sent to your email! Check your inbox.');
+        setForgotPasswordStep('otp');
+        setTimeout(() => setForgotPasswordSuccess(''), 3000);
+      } else {
+        const errObj = await res.json();
+        setForgotPasswordError(errObj.detail || 'Failed to send OTP');
+      }
+    } catch (err) {
+      setForgotPasswordError('Server error. Please try again.');
+    } finally {
+      setForgotPasswordLoading(false);
+    }
+  };
+
+  const handleForgotPasswordVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotPasswordError('');
+    setForgotPasswordLoading(true);
+
+    if (!forgotPasswordOtp.trim()) {
+      setForgotPasswordError('Please enter the OTP');
+      setForgotPasswordLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/v1/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: forgotPasswordEmail, otp: forgotPasswordOtp })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setForgotPasswordResetToken(data.resetToken);
+        setForgotPasswordSuccess('OTP verified! Now set your new password.');
+        setForgotPasswordStep('reset');
+        setTimeout(() => setForgotPasswordSuccess(''), 3000);
+      } else {
+        const errObj = await res.json();
+        setForgotPasswordError(errObj.detail || 'Invalid OTP');
+      }
+    } catch (err) {
+      setForgotPasswordError('Server error. Please try again.');
+    } finally {
+      setForgotPasswordLoading(false);
+    }
+  };
+
+  const handleForgotPasswordReset = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotPasswordError('');
+    setForgotPasswordLoading(true);
+
+    if (!forgotPasswordNewPassword.trim() || !forgotPasswordConfirmPassword.trim()) {
+      setForgotPasswordError('Please enter a new password and confirm it');
+      setForgotPasswordLoading(false);
+      return;
+    }
+
+    if (forgotPasswordNewPassword.length < 8) {
+      setForgotPasswordError('Password must be at least 8 characters long');
+      setForgotPasswordLoading(false);
+      return;
+    }
+
+    if (forgotPasswordNewPassword !== forgotPasswordConfirmPassword) {
+      setForgotPasswordError('Passwords do not match');
+      setForgotPasswordLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/v1/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          resetToken: forgotPasswordResetToken, 
+          newPassword: forgotPasswordNewPassword 
+        })
+      });
+
+      if (res.ok) {
+        setForgotPasswordSuccess('Password reset successfully! Redirecting to login...');
+        setTimeout(() => {
+          setIsForgotPasswordOpen(false);
+          setForgotPasswordStep('email');
+          setForgotPasswordEmail('');
+          setForgotPasswordOtp('');
+          setForgotPasswordNewPassword('');
+          setForgotPasswordConfirmPassword('');
+          setForgotPasswordResetToken('');
+          setForgotPasswordSuccess('');
+        }, 2000);
+      } else {
+        const errObj = await res.json();
+        setForgotPasswordError(errObj.detail || 'Failed to reset password');
+      }
+    } catch (err) {
+      setForgotPasswordError('Server error. Please try again.');
+    } finally {
+      setForgotPasswordLoading(false);
+    }
+  };
+
+  const closeForgotPassword = () => {
+    setIsForgotPasswordOpen(false);
+    setForgotPasswordStep('email');
+    setForgotPasswordEmail('');
+    setForgotPasswordOtp('');
+    setForgotPasswordNewPassword('');
+    setForgotPasswordConfirmPassword('');
+    setForgotPasswordResetToken('');
+    setForgotPasswordError('');
+    setForgotPasswordSuccess('');
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+
+    if (!signUpFullName.trim() || !signUpEmail.trim() || !signUpPhone.trim() || !signUpPassword || !signUpConfirmPassword) {
+      setErrorMsg('Please complete all registration fields.');
+      return;
+    }
+
+    if (signUpPassword.length < 8) {
+      setErrorMsg('Password must be at least 8 characters long.');
+      return;
+    }
+
+    if (signUpPassword !== signUpConfirmPassword) {
+      setErrorMsg('Password and confirmation do not match.');
+      return;
+    }
+
     try {
       const res = await fetch('/api/v1/auth/signup', {
         method: 'POST',
@@ -820,7 +1061,9 @@ export default function App() {
           fullName: signUpFullName, 
           email: signUpEmail, 
           phone: signUpPhone,
-          role: signUpRole 
+          role: signUpRole,
+          password: signUpPassword,
+          confirmPassword: signUpConfirmPassword
         })
       });
       if (res.ok) {
@@ -831,6 +1074,8 @@ export default function App() {
         setSignUpFullName('');
         setSignUpEmail('');
         setSignUpPhone('');
+        setSignUpPassword('');
+        setSignUpConfirmPassword('');
         setSignUpRole('TRAINEE');
         setIsSignUp(false);
       } else {
@@ -1819,7 +2064,10 @@ export default function App() {
                       </label>
                       <button 
                         type="button"
-                        onClick={() => alert(`[DEMO PRESETS DETECTED] Present accounts on segments have password: 'password'.`)}
+                        onClick={() => {
+                          setIsForgotPasswordOpen(true);
+                          setForgotPasswordError('');
+                        }}
                         className="text-[11px] text-[#6B1020] font-bold uppercase tracking-wider hover:underline"
                       >
                         LOST KEY?
@@ -1953,6 +2201,56 @@ export default function App() {
                     />
                   </div>
 
+                  {/* Password field */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                      PASSWORD
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showSignUpPassword ? 'text' : 'password'}
+                        value={signUpPassword}
+                        onChange={(e) => setSignUpPassword(e.target.value)}
+                        className="w-full h-[45px] px-4 pr-12 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors"
+                        placeholder="At least 8 characters"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSignUpPassword(!showSignUpPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                        title={showSignUpPassword ? 'Hide password' : 'Show password'}
+                      >
+                        <Eye className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Confirm Password field */}
+                  <div>
+                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                      CONFIRM PASSWORD
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showSignUpConfirmPassword ? 'text' : 'password'}
+                        value={signUpConfirmPassword}
+                        onChange={(e) => setSignUpConfirmPassword(e.target.value)}
+                        className="w-full h-[45px] px-4 pr-12 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors"
+                        placeholder="Re-type password"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowSignUpConfirmPassword(!showSignUpConfirmPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none"
+                        title={showSignUpConfirmPassword ? 'Hide password' : 'Show password'}
+                      >
+                        <Eye className="w-5 h-5" />
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Role field */}
                   <div>
                     <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
@@ -1966,6 +2264,7 @@ export default function App() {
                       <option value="TRAINEE">Enrolled Trainee / Student</option>
                       <option value="SUPERVISOR">Industry Host Supervisor</option>
                       <option value="OFFICER">Assessment Dispatch Officer</option>
+                      <option value="ADMIN">Institutional Admin</option>
                     </select>
                   </div>
 
@@ -1990,6 +2289,164 @@ export default function App() {
                 </form>
               )}
             </div>
+
+            {/* Forgot Password Modal */}
+            {isForgotPasswordOpen && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
+                  {/* Close button */}
+                  <button
+                    onClick={closeForgotPassword}
+                    className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+                  >
+                    <XSquare className="w-6 h-6" />
+                  </button>
+
+                  {/* Header */}
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-bold text-[#1a1a1a]">
+                      {forgotPasswordStep === 'email' && 'Recover Password'}
+                      {forgotPasswordStep === 'otp' && 'Verify Code'}
+                      {forgotPasswordStep === 'reset' && 'Set New Password'}
+                    </h3>
+                    <p className="text-gray-500 text-sm mt-1">
+                      {forgotPasswordStep === 'email' && 'Enter your email to receive a verification code'}
+                      {forgotPasswordStep === 'otp' && 'Enter the 6-digit code sent to your email'}
+                      {forgotPasswordStep === 'reset' && 'Create a strong new password'}
+                    </p>
+                  </div>
+
+                  {/* Error Message */}
+                  {forgotPasswordError && (
+                    <div className="p-3 bg-red-50 text-red-700 rounded-lg text-xs font-semibold border border-red-100 flex items-center gap-2 mb-4">
+                      <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+                      {forgotPasswordError}
+                    </div>
+                  )}
+
+                  {/* Success Message */}
+                  {forgotPasswordSuccess && (
+                    <div className="p-3 bg-green-50 text-green-700 rounded-lg text-xs font-semibold border border-green-100 flex items-center gap-2 mb-4">
+                      <CheckCircle className="w-4 h-4 text-green-600 shrink-0" />
+                      {forgotPasswordSuccess}
+                    </div>
+                  )}
+
+                  {/* Step 1: Email */}
+                  {forgotPasswordStep === 'email' && (
+                    <form onSubmit={handleForgotPasswordSendOtp} className="space-y-4">
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                          INSTITUTIONAL EMAIL
+                        </label>
+                        <input
+                          type="email"
+                          value={forgotPasswordEmail}
+                          onChange={(e) => setForgotPasswordEmail(e.target.value)}
+                          className="w-full h-[45px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors"
+                          placeholder="name@polytechnic.ac.ke"
+                          required
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={forgotPasswordLoading}
+                        className="w-full h-[45px] bg-[#6B1020] hover:bg-[#8C1D2F] disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-[0.15em] rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {forgotPasswordLoading ? 'SENDING...' : 'SEND CODE'}
+                      </button>
+                    </form>
+                  )}
+
+                  {/* Step 2: OTP */}
+                  {forgotPasswordStep === 'otp' && (
+                    <form onSubmit={handleForgotPasswordVerifyOtp} className="space-y-4">
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                          VERIFICATION CODE
+                        </label>
+                        <input
+                          type="text"
+                          value={forgotPasswordOtp}
+                          onChange={(e) => setForgotPasswordOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                          className="w-full h-[45px] px-4 border border-[#E5E7EB] rounded-lg text-sm font-bold text-center tracking-[0.2em] focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors"
+                          placeholder="000000"
+                          maxLength={6}
+                          required
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 text-center">Check your email for the code</p>
+                      <button
+                        type="submit"
+                        disabled={forgotPasswordLoading}
+                        className="w-full h-[45px] bg-[#6B1020] hover:bg-[#8C1D2F] disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-[0.15em] rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {forgotPasswordLoading ? 'VERIFYING...' : 'VERIFY CODE'}
+                      </button>
+                    </form>
+                  )}
+
+                  {/* Step 3: Reset Password */}
+                  {forgotPasswordStep === 'reset' && (
+                    <form onSubmit={handleForgotPasswordReset} className="space-y-4">
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                          NEW PASSWORD
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showForgotNewPassword ? 'text' : 'password'}
+                            value={forgotPasswordNewPassword}
+                            onChange={(e) => setForgotPasswordNewPassword(e.target.value)}
+                            className="w-full h-[45px] pl-4 pr-12 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors"
+                            placeholder="At least 8 characters"
+                            required
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowForgotNewPassword(!showForgotNewPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                          >
+                            <Eye className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                          CONFIRM PASSWORD
+                        </label>
+                        <div className="relative">
+                          <input
+                            type={showForgotConfirmPassword ? 'text' : 'password'}
+                            value={forgotPasswordConfirmPassword}
+                            onChange={(e) => setForgotPasswordConfirmPassword(e.target.value)}
+                            className="w-full h-[45px] pl-4 pr-12 border border-[#E5E7EB] rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#7B1C2E]/20 focus:border-[#7B1C2E] bg-white text-gray-800 transition-colors"
+                            placeholder="Re-type password"
+                            required
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowForgotConfirmPassword(!showForgotConfirmPassword)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 cursor-pointer"
+                          >
+                            <Eye className="w-5 h-5" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <button
+                        type="submit"
+                        disabled={forgotPasswordLoading}
+                        className="w-full h-[45px] bg-[#6B1020] hover:bg-[#8C1D2F] disabled:bg-gray-400 text-white font-bold text-xs uppercase tracking-[0.15em] rounded-lg transition-all cursor-pointer flex items-center justify-center gap-2"
+                      >
+                        {forgotPasswordLoading ? 'RESETTING...' : 'RESET PASSWORD'}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ) : (
@@ -4141,9 +4598,17 @@ export default function App() {
                   
                   {/* Left Column (7 cols): Trainees List */}
                   <div className="lg:col-span-7 bg-white shadow-sm border rounded-xl p-5 space-y-4">
-                    <div className="border-b pb-2">
-                      <h3 className="font-bold text-gray-800 text-sm">Assigned Students Attachment Timeline</h3>
-                      <p className="text-gray-500 text-[11px] mt-0.5">Select a student row below to locate their registered workplace on the map.</p>
+                    <div className="border-b pb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                      <div>
+                        <h3 className="font-bold text-gray-800 text-sm">Assigned Students Attachment Timeline</h3>
+                        <p className="text-gray-500 text-[11px] mt-0.5">Select a student row below to locate their registered workplace on the map.</p>
+                      </div>
+                      <button
+                        onClick={handleDownloadAssignedTimelinePDF}
+                        className="bg-[#7B1C2E] hover:bg-[#6A1727] text-white px-3 py-2 rounded-lg text-[11px] font-bold transition"
+                      >
+                        Download Timeline PDF
+                      </button>
                     </div>
                     
                     <div className="overflow-x-auto">
